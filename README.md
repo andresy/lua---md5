@@ -28,7 +28,7 @@ md5.string(<string>)
 ```
 or
 ```lua
-md5.file(<filename>')
+md5.file(<filename>)
 ```
 
 `md5.string()` returns a string.
