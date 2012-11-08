@@ -33,3 +33,26 @@ md5.file(<filename>)
 
 `md5.string()` returns a string.
 `md5.file()` returns a string if the given filename is valid, `nil` otherwise.
+
+Advanced usage
+--------------
+
+For finer control over the library, one can also use the following functions:
+
+```lua
+md5.init(MD5_CTX *);
+md5.update(MD5_CTX *, unsigned char *, unsigned int)
+md5.final(unsigned char [16], MD5_CTX *);
+```
+
+Note that the functions expect FFI types. `MD5_CTX` is defined through FFI with:
+
+```c
+typedef struct {
+  UINT4 state[4];                                   /* state (ABCD) */
+  UINT4 count[2];        /* number of bits, modulo 2^64 (lsb first) */
+  unsigned char buffer[64];                         /* input buffer */
+} MD5_CTX;
+```
+
+For more details, please refer to [the RFC1321 documentation](http://www.ietf.org/rfc/rfc1321.txt).
