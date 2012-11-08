@@ -31,7 +31,6 @@ ffi.cdef[[
     unsigned int state[4];        /* state (ABCD) */
     unsigned int count[2];      /* number of bits, modulo 2^64 (lsb first) */
     unsigned char buffer[64];     /* input buffer */
-    unsigned char digest[16]; /* actual digest after Md5.Final call */
  } MD5_CTX;
 
 ]]
@@ -244,7 +243,7 @@ function md5.update(context, input, inputLen)
    ffi.copy(context.buffer+index, input+i, inputLen-i)
 end
 
-function md5.final(context)
+function md5.final(digest, context)
    local bits = ffi.new('unsigned char[8]')
 
    encode(bits, context.count, 8)
@@ -258,17 +257,18 @@ function md5.final(context)
    md5.update(context, bits, 8)
 
    -- storage state in digest
-   encode(context.digest, context.state, 16)
+   encode(digest, context.state, 16)
 end
 
 function md5.string(str)
    local ctx = ffi.new('MD5_CTX')
+   local digest = ffi.new('unsigned char[16]')
    md5.init(ctx)
    md5.update(ctx, ffi.cast('const unsigned char*', str), #str)
-   md5.final(ctx)
+   md5.final(digest, ctx)
    local strsum = {}
    for i=0,16-1 do
-      table.insert(strsum, bit.tohex(ctx.digest[i], 2))
+      table.insert(strsum, bit.tohex(digest[i], 2))
    end
    return table.concat(strsum)
 end
