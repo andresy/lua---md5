@@ -27,15 +27,6 @@ local MD5_CTX_state = ffi.typeof("unsigned int[4]")
 local MD5_CTX_count = ffi.typeof("unsigned int[2]")
 local MD5_CTX_buffer = u_char_64
 
-function md5.init(context)
-	context.count[0] = 0
-	context.count[1] = 0
-	-- load magic initialization constants.
-	context.state[0] = 0x67452301
-	context.state[1] = 0xefcdab89
-	context.state[2] = 0x98badcfe
-	context.state[3] = 0x10325476
-end
 
 local function F(x, y, z)
 	--   return bit.bor(bit.band(x, y), bit.band(bit.bnot(x), z))
@@ -249,13 +240,12 @@ local const_u_char = ffi.typeof("const unsigned char*")
 
 function md5.string(str)
 	local ctx = {
-		state = MD5_CTX_state(),
-		count = MD5_CTX_count(),
+		state = MD5_CTX_state(0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476),
+		count = MD5_CTX_count(0, 0),
 		buffer = MD5_CTX_buffer()
 	}
 
 	local digest = u_char_16()
-	md5.init(ctx)
 	md5.update(ctx, ffi.cast(const_u_char, str), #str)
 	md5.final(digest, ctx)
 	local a = bit.lshift(digest[0], 24) + bit.lshift(digest[1], 16) + bit.lshift(digest[2], 8) + digest[3]
